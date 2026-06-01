@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Trace & Strike</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mac: {
+              bg: '#05070f',
+              panel: 'rgba(20, 24, 38, 0.45)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glassHighlight: 'rgba(255, 255, 255, 0.04)',
+              accent: '#ff453a', /* Apple System Red */
+              orange: '#ff9f0a', /* Apple System Orange */
+              green: '#30d158', /* Apple System Green */
+              blue: '#0a84ff', /* Apple System Blue */
+              indigo: '#5e5ce6' /* Apple System Indigo */
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #05070f;
+      overflow-x: hidden;
+    }
+
+    code,
+    pre,
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* macOS Liquid Frosted Glass material */
+    .mac-glass {
+      background: rgba(18, 22, 36, 0.42);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    /* Glossy Overlay reflection */
+    .mac-glass::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 60%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    /* Header frosted bar */
+    .mac-header {
+      background: rgba(8, 10, 18, 0.55);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 4 Floating Liquid Orbs */
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(95px);
+      opacity: 0.8;
+    }
+
+    .bg-orb-red {
+      top: 5%;
+      left: -5%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255, 69, 58, 0.12) 0%, rgba(255, 69, 58, 0) 70%);
+      animation: floatOrb 22s infinite alternate ease-in-out;
+    }
+
+    .bg-orb-green {
+      bottom: 5%;
+      right: -5%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(48, 209, 88, 0.08) 0%, rgba(48, 209, 88, 0) 70%);
+      animation: floatOrb 30s infinite alternate-reverse ease-in-out;
+    }
+
+    .bg-orb-blue {
+      top: 45%;
+      left: 55%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(10, 132, 255, 0.09) 0%, rgba(10, 132, 255, 0) 70%);
+      animation: floatOrb 26s infinite alternate ease-in-out;
+    }
+
+    .bg-orb-indigo {
+      bottom: 30%;
+      left: 10%;
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(94, 92, 230, 0.1) 0%, rgba(94, 92, 230, 0) 70%);
+      animation: floatOrb 28s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes floatOrb {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+
+      50% {
+        transform: translate(90px, -70px) scale(1.15) rotate(180deg);
+      }
+
+      100% {
+        transform: translate(-60px, 80px) scale(0.9) rotate(360deg);
+      }
+    }
+
+    /* Custom macOS minimal scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    /* Dynamic Card states with sleek animated hover shine */
+    .glass-card-hover {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card-hover:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(255, 255, 255, 0.18) !important;
+      box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 0 25px rgba(255, 255, 255, 0.03);
+    }
+
+    .mac-badge-exploited {
+      box-shadow: 0 0 15px rgba(48, 209, 88, 0.15);
+      border-color: rgba(48, 209, 88, 0.35) !important;
+    }
+
+    .mac-badge-sast {
+      box-shadow: 0 0 15px rgba(255, 159, 10, 0.08);
+      border-color: rgba(255, 159, 10, 0.2) !important;
+    }
+
+    /* macOS vibrant red active selection state */
+    .mac-active-selection {
+      background: rgba(255, 69, 58, 0.08) !important;
+      border-color: rgba(255, 69, 58, 0.5) !important;
+      box-shadow:
+        0 12px 30px rgba(255, 69, 58, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .mac-active-selection span {
+      text-shadow: 0 0 10px rgba(255, 69, 58, 0.4);
+    }
+
+    /* macOS traffic lights styling */
+    .traffic-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .traffic-lights:hover .traffic-dot::before {
+      opacity: 1;
+    }
+
+    .traffic-dot::before {
+      content: '';
+      position: absolute;
+      font-size: 8px;
+      font-weight: bold;
+      opacity: 0;
+      color: rgba(0, 0, 0, 0.6);
+      transition: opacity 0.2s ease;
+    }
+
+    .traffic-close::before {
+      content: '×';
+      top: -0.5px;
+    }
+
+    .traffic-min::before {
+      content: '−';
+      top: -1.5px;
+    }
+
+    .traffic-max::before {
+      content: '+';
+      top: -1px;
+    }
+
+    /* macOS Segmented Tab control slider style */
+    .segmented-control {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 2.5px;
+      border-radius: 11px;
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    .segmented-tab {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .segmented-tab-active {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .hljs {
+      background: transparent !important;
+      padding: 0 !important;
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.995);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-slide-up-fade {
+      animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes springIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      70% {
+        transform: translateY(-2px) scale(1.005);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-spring-in {
+      animation: springIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes propagateRight {
+      from {
+        opacity: 0;
+        transform: translateX(-15px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    .animate-propagate {
+      animation: propagateRight 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideRightFade {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .animate-slide-right-fade {
+      animation: slideRightFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body class="h-full text-slate-100 antialiased relative">
+  <!-- Interactive cursor glow light source -->
+  <div id="cursorGlow" class="pointer-events-none fixed w-[350px] h-[350px] rounded-full bg-mac-blue/4 filter blur-[90px] opacity-0 transition-opacity duration-500 z-0 select-none"></div>
+
+  <!-- 4 Layered Background Liquid Orbs -->
+  <div class="bg-orb bg-orb-red"></div>
+  <div class="bg-orb bg-orb-green"></div>
+  <div class="bg-orb bg-orb-blue"></div>
+  <div class="bg-orb bg-orb-indigo"></div>
+
+  <div id="app" class="min-h-full flex flex-col relative z-10">
+    <!-- macOS Top Header -->
+    <header class="mac-header sticky top-0 z-30">
+      <div class="max-w-[1600px] mx-auto px-8 py-4.5 flex flex-wrap items-center justify-between gap-4">
+
+        <!-- Left: Traffic Lights & Title -->
+        <div class="flex items-center gap-6">
+          <div class="traffic-lights flex gap-2.5 shrink-0">
+            <span class="traffic-dot traffic-close bg-mac-accent"></span>
+            <span class="traffic-dot traffic-min bg-mac-orange"></span>
+            <span class="traffic-dot traffic-max bg-mac-green"></span>
+          </div>
+          <div class="h-5 w-[1px] bg-white/10 hidden md:block"></div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-mac-accent animate-ping shadow-[0_0_8px_#ff453a]"></span>
+              <p class="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">Trace & Strike Security
+                Suite</p>
+            </div>
+            <h1
+              class="text-2xl font-extrabold tracking-tight mt-0.5 bg-gradient-to-r from-slate-100 via-white to-slate-400 bg-clip-text text-transparent">
+              Trace & Strike </h1>
+          </div>
+        </div>
+
+        <!-- Center: Status Display -->
+        <div
+          class="hidden lg:flex items-center gap-3 bg-black/40 border border-white/5 px-4 py-2 rounded-2xl text-xs text-slate-300 font-mono shadow-inner max-w-lg">
+          <span class="text-mac-green">● Ready</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-slate-400 truncate">Workspace:  Trace & Strike</span>
+        </div>
+
+        <!-- Right: Action & Metadata -->
+        <div class="flex items-center gap-4">
+          <span id="runMeta"
+            class="text-[11px] font-mono bg-white/5 border border-white/5 px-3 py-1.5 rounded-xl text-slate-400"></span>
+          <button id="reloadBtn"
+            class="px-5 py-2.5 rounded-xl bg-mac-accent hover:brightness-110 text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,69,58,0.4)] border border-white/10">Reload
+            </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Metrics Grid -->
+    <section class="max-w-[1600px] mx-auto px-8 pt-8 pb-4 w-full relative z-10">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5" id="metrics"></div>
+    </section>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-[1600px] mx-auto px-8 pb-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+
+      <!-- Left: Sidebar Findings (3 cols) -->
+      <aside class="lg:col-span-3 space-y-4">
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Project Findings</h2>
+          <span class="text-[10px] font-mono text-slate-600 font-semibold uppercase tracking-wider">Dynamic</span>
+        </div>
+        <div id="findingList" class="space-y-3 max-h-[72vh] overflow-y-auto pr-1"></div>
+      </aside>
+
+      <!-- Center: Main Sandbox Workspace (6 cols) -->
+      <section class="lg:col-span-6 space-y-6" id="workspaceContainer">
+
+        <!-- Empty State fallback -->
+        <div id="emptyState" class="hidden mac-glass rounded-2xl p-16 text-center shadow-2xl relative z-10">
+          <p class="text-sm text-slate-400">Telemetry file was not resolved. Ensure the ODA platform is running locally.
+          </p>
+        </div>
+
+        <div id="workspace" class="hidden space-y-6">
+
+          <!-- Taint flow visually bridged -->
+          <div class="mac-glass p-5 rounded-2xl shadow-lg relative z-10 overflow-hidden">
+            <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+              <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">AST Taint Propagation Path</h3>
+              <span
+                class="text-[10px] font-mono text-mac-blue bg-mac-blue/10 px-2 py-0.5 rounded border border-mac-blue/20">Dataflow
+                Visualizer</span>
+            </div>
+            <div id="taintFlow" class="flex flex-wrap items-center gap-3 text-[11px] font-mono"></div>
+          </div>
+
+          <!-- Code Pane Editor -->
+          <div class="mac-glass flex flex-col rounded-2xl overflow-hidden shadow-2xl relative z-10 min-h-[480px]">
+            <div class="px-5 py-3.5 border-b border-white/5 bg-slate-950/30 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-mac-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <h3 class="text-xs font-bold uppercase text-slate-300">Vulnerable IDE Viewport</h3>
+              </div>
+              <span id="codeMeta"
+                class="text-[10px] bg-white/5 border border-white/5 px-2.5 py-1 rounded-md text-slate-400 font-mono"></span>
+            </div>
+            <pre
+              class="flex-1 overflow-auto p-5 text-xs bg-[#0b0d16]/30"><code id="codeView" class="language-java hljs"></code></pre>
+          </div>
+
+          <!-- Remediation native sheet -->
+          <div
+            class="mac-glass border-mac-green/20 bg-mac-green/5 p-6 rounded-2xl relative z-10 flex items-start gap-4 shadow-xl">
+            <div
+              class="w-10 h-10 rounded-full bg-mac-green/10 border border-mac-green/20 flex items-center justify-center shrink-0 shadow-lg">
+              <svg class="w-5 h-5 text-mac-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-[11px] font-bold text-mac-green uppercase tracking-wider mb-2">Automated Code Remediation
+                Advice</h3>
+              <pre
+                class="text-xs font-mono text-emerald-100/90 whitespace-pre-wrap leading-relaxed bg-black/20 p-4.5 rounded-xl border border-white/5 shadow-inner"
+                id="remediation"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Exploit Inspector Side Panel (3 cols — Permanently Pinned) -->
+      <aside class="lg:col-span-3 self-start flex flex-col mac-glass rounded-2xl overflow-hidden shadow-2xl relative"
+        id="exploitPanel">
+        <!-- Header -->
+        <div class="px-5 py-4 border-b border-white/5 bg-slate-950/30 flex items-center gap-2 relative z-10"
+          id="panelHeader">
+          <span class="w-2.5 h-2.5 rounded-full bg-mac-accent animate-pulse shadow-[0_0_8px_#ff453a]"></span>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Exploit POC</h3>
+        </div>
+
+        <!-- Body inspector panels -->
+        <div class="flex-1 overflow-y-auto p-5 space-y-6 relative z-10" id="panelBody">
+          <!-- Live Indicator Badge -->
+          <div class="flex items-center justify-between border-b border-white/5 pb-3">
+            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Verification Status</span>
+            <span id="strikeBadge"
+              class="text-xs font-mono px-3 py-1.5 rounded-xl bg-black/40 border border-white/5 shadow-inner"></span>
+          </div>
+
+          <!-- Payload block -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Context Payload</h4>
+            <div
+              class="bg-[#070912]/65 border border-white/5 border-l-2 border-l-mac-accent/70 rounded-xl p-4 text-[12.5px] font-mono text-mac-accent select-all shadow-inner whitespace-pre-wrap break-all leading-relaxed"
+              id="exploitPayload"></div>
+          </div>
+
+          <!-- Tab control for Request/Response -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Payload Stream</h4>
+              <div class="segmented-control relative">
+                <div id="tabPill"
+                  class="absolute top-[2.5px] bottom-[2.5px] rounded-lg bg-white/12 border border-white/8 shadow-inner transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none">
+                </div>
+                <button data-tab="curl" class="tab-btn segmented-tab text-white z-10 relative font-bold">cURL</button>
+                <button data-tab="request"
+                  class="tab-btn segmented-tab text-slate-400 hover:text-white z-10 relative">Request</button>
+                <button data-tab="response"
+                  class="tab-btn segmented-tab text-slate-400 hover:text-white z-10 relative">Response</button>
+              </div>
+            </div>
+            <!-- Code view block -->
+            <pre
+              class="overflow-y-auto overflow-x-hidden p-5 text-[12.5px] leading-relaxed font-mono text-slate-300 bg-[#070912]/85 border border-white/5 rounded-2xl max-h-[50vh] shadow-inner select-text block"><code id="httpView" class="block whitespace-pre-wrap break-all select-text font-mono"></code></pre>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    let data = null;
+    let selectedId = 0;
+    let activeTab = 'curl';
+
+    const $ = (s) => document.querySelector(s);
+
+    async function load() {
+      const btn = $('#reloadBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Reloading...';
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        console.log('[ODA] Fetching telemetry data...');
+        const res = await fetch('dashboard-telemetry.json?_=' + Date.now());
+        if (!res.ok) throw new Error('HTTP status ' + res.status);
+        data = await res.json();
+        console.log('[ODA] Telemetry loaded:', data);
+        render();
+        console.log('[ODA] Render complete.');
+      } catch (e) {
+        console.error('[ODA] Telemetry fetch failed:', e);
+        $('#emptyState').classList.remove('hidden');
+        $('#workspace').classList.add('hidden');
+        $('#emptyState').innerHTML = `
+          <div class="max-w-md mx-auto">
+            <div class="w-16 h-16 bg-mac-accent/10 border border-mac-accent/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_15px_rgba(255,69,58,0.15)]">
+              <svg class="w-8 h-8 text-mac-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <p class="text-xl font-bold text-slate-100 mb-3">Telemetry Connection Interrupted</p>
+            <p class="text-sm text-slate-400 mb-6 leading-relaxed">The browser blocked loading direct telemetry assets locally. To run successfully, launch ODA's local loopback cross-platform server.</p>
+            <div class="bg-black/45 border border-white/5 rounded-2xl p-5 text-left font-mono text-xs text-slate-300 space-y-3.5 shadow-inner">
+              <p><span class="text-slate-500">// Deploy ODA on Linux & macOS</span><br><span class="text-mac-accent">./run.sh</span></p>
+              <div class="h-[1px] bg-white/5"></div>
+              <p><span class="text-slate-500">// Deploy ODA on Windows</span><br><span class="text-mac-accent">run.bat</span></p>
+            </div>
+            <p class="mt-6 text-xs text-mac-blue font-bold uppercase tracking-wider"><a href="http://localhost:8765/dashboard.html" class="hover:underline">Reload local server endpoint</a></p>
+            <p class="text-[10px] text-slate-600 mt-4 leading-normal">CORS file protections active. Browsers require active HTTP binding servers for JSON access.</p>
+          </div>`;
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function render() {
+      const s = data.summary || {};
+      $('#runMeta').textContent = `${data.runId || ''} · v${data.schemaVersion || '?'}`;
+
+      const tpRate = ((s.truePositiveRate ?? 0) * 100).toFixed(0);
+      const metrics = [
+        { label: 'Total findings', value: s.total ?? 0, color: 'text-white', border: 'border-t-slate-400/20' },
+        { label: 'DAST confirmed (TP)', value: s.confirmed ?? 0, color: 'text-mac-green', border: 'border-t-mac-green/50 mac-badge-exploited' },
+        { label: 'Not confirmed (FP)', value: s.falsePositives ?? 0, color: 'text-mac-orange', border: 'border-t-mac-orange/50 mac-badge-sast' },
+        { label: 'TP rate', value: tpRate + '%', color: 'text-mac-blue', border: 'border-t-mac-blue/50' },
+        { label: 'Critical', value: s.critical ?? 0, color: 'text-mac-accent', border: 'border-t-mac-accent/50' },
+        { label: 'High', value: s.high ?? 0, color: 'text-mac-orange', border: 'border-t-mac-orange/50' },
+      ];
+
+      $('#metrics').innerHTML = metrics.map((m, idx) => `
+        <div class="mac-glass border-t-2 ${m.border} p-5 rounded-2xl flex flex-col justify-between glass-card-hover relative overflow-hidden group animate-spring-in" style="animation-delay: ${idx * 60}ms">
+          <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-white/2 rounded-full filter blur-xl group-hover:bg-white/5 transition-all duration-300"></div>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${m.label}</p>
+          <p class="text-3xl font-extrabold mt-3 tracking-tight ${m.color}">${m.value}</p>
+        </div>
+      `).join('');
+
+      const findings = data.findings || [];
+      if (!findings.length) {
+        $('#emptyState').classList.remove('hidden');
+        $('#workspace').classList.add('hidden');
+        return;
+      }
+
+      $('#emptyState').classList.add('hidden');
+      $('#workspace').classList.remove('hidden');
+
+      $('#findingList').innerHTML = findings.map((f, i) => {
+        const ok = f.strike?.exploitable || f.strike?.isExploitable;
+        const active = i === selectedId ? 'mac-active-selection' : 'border-white/5 hover:border-white/10 hover:bg-white/5';
+        const glowClass = ok ? 'text-mac-green' : 'text-mac-orange';
+        const okBorderClass = ok ? 'border-mac-green/20' : 'border-mac-orange/20';
+        return `
+          <button data-id="${i}" class="finding-item w-full text-left rounded-xl p-4 transition-all duration-300 ${active} mac-glass border ${okBorderClass} relative overflow-hidden animate-slide-right-fade" style="animation-delay: ${i * 45}ms">
+            <div class="flex justify-between items-start gap-2 relative z-10">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider ${glowClass}">${f.type}</span>
+              <span class="text-[9px] px-2 py-0.5 rounded-full font-bold border ${ok ? 'bg-mac-green/10 text-mac-green border-mac-green/30 mac-badge-exploited' : 'bg-mac-orange/10 text-mac-orange border-mac-orange/30'} flex items-center gap-1.5">
+                ${ok ? '<span class="w-1.5 h-1.5 rounded-full bg-mac-green animate-pulse"></span>' : ''}
+                ${ok ? 'EXPLOITED' : 'SAST ONLY'}
+              </span>
+            </div>
+            <p class="text-sm mt-3.5 font-bold text-slate-100 relative z-10">${f.parameter} <span class="text-slate-600 font-normal">→</span> ${f.sinkMethod}</p>
+            <p class="text-[10px] text-slate-500 font-mono mt-1 relative z-10">${f.file}:${f.line}</p>
+          </button>`;
+      }).join('');
+
+      document.querySelectorAll('.finding-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedId = Number(btn.dataset.id);
+          renderFinding();
+          render();
+        });
+      });
+
+      renderFinding();
+    }
+
+    function renderFinding() {
+      const f = data.findings[selectedId];
+      if (!f) return;
+
+      const ws = $('#workspace');
+      if (ws) {
+        ws.classList.remove('animate-slide-up-fade');
+        void ws.offsetWidth;
+        ws.classList.add('animate-slide-up-fade');
+      }
+
+      $('#taintFlow').innerHTML = (f.taintFlow || []).map((node, i, arr) => {
+        const arrow = i < arr.length - 1 ? `<span class="text-slate-500 font-bold animate-propagate" style="animation-delay: ${i * 120 + 60}ms">→</span>` : '';
+        return `<span class="px-3.5 py-1.5 rounded-xl bg-black/45 border border-white/5 shadow-inner text-slate-300 font-medium animate-propagate" style="animation-delay: ${i * 120}ms">${node}</span>${arrow}`;
+      }).join('');
+
+      $('#codeMeta').textContent = `${f.file} · line ${f.line}`;
+      const src = data.sourceCode || '';
+      const lines = src.split('\n');
+      const highlighted = lines.map((line, i) => {
+        const n = i + 1;
+        const mark = n === f.line ? 'background:rgba(255,69,58,0.18);border-left:3px solid #ff453a;padding-left:8px;box-shadow: 0 0 15px rgba(255, 69, 58, 0.05)' : '';
+        let lineHtml = esc(line);
+        try {
+          lineHtml = hljs.highlight(line, { language: 'java' }).value;
+        } catch (e) {
+          console.error('[HLJS]', e);
+        }
+        return `<span style="display:block;${mark}"><span class="text-slate-600 select-none mr-4 inline-block w-8 text-right font-mono">${n}</span>${lineHtml}</span>`;
+      }).join('');
+      const codeEl = $('#codeView');
+      codeEl.innerHTML = highlighted || esc(f.sinkSnippet || '');
+
+      const strike = f.strike || {};
+      const ok = strike.exploitable || strike.isExploitable;
+      $('#strikeBadge').innerHTML = ok
+        ? '<span class="text-mac-green flex items-center gap-1.5 font-bold uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-mac-green animate-ping"></span>VERIFIED</span>'
+        : '<span class="text-slate-500 font-bold uppercase tracking-wider">STATIC ONLY</span>';
+
+      $('#exploitPayload').textContent = strike.payload || '—';
+      $('#remediation').textContent = f.remediationSnippet || 'Use parameterized queries and contextual output encoding.';
+
+      renderHttpTab(f);
+      setTimeout(updateTabPill, 50);
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.onclick = () => {
+          if (activeTab === b.dataset.tab) return;
+          activeTab = b.dataset.tab;
+
+          document.querySelectorAll('.tab-btn').forEach(x => {
+            if (x.dataset.tab === activeTab) {
+              x.className = 'tab-btn segmented-tab text-white z-10 relative font-bold';
+            } else {
+              x.className = 'tab-btn segmented-tab text-slate-400 hover:text-white z-10 relative';
+            }
+          });
+
+          updateTabPill();
+
+          const viewContainer = $('#httpView').parentElement;
+          viewContainer.classList.add('transition-all', 'duration-200', 'ease-in-out');
+          viewContainer.classList.add('opacity-0', 'translate-y-1', 'scale-[0.995]');
+
+          setTimeout(() => {
+            renderHttpTab(f);
+            viewContainer.classList.remove('opacity-0', 'translate-y-1', 'scale-[0.995]');
+          }, 120);
+        };
+      });
+    }
+
+    function highlightHttp(text) {
+      if (!text || text === '—') return '<span class="text-slate-500 font-mono">—</span>';
+      if (text.startsWith('curl')) {
+        const escaped = esc(text);
+        return escaped
+          .replace(/\\$/gm, '<span class="text-slate-500">\\</span>')
+          .replace(/(curl)/g, '<span class="text-mac-accent font-extrabold">$1</span>')
+          .replace(/( -i| -X [A-Z]+| -H &quot;[^&]+&quot;| -d &quot;[^&]+&quot;)/g, '<span class="text-mac-blue font-mono font-medium">$1</span>')
+          .replace(/(&quot;[^&]+&quot;)/g, '<span class="text-mac-green font-mono font-semibold">$1</span>');
+      }
+      const lines = text.split('\n');
+      let isBody = false;
+      let highlightedLines = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Empty line separates headers from body
+        if (line.trim() === '') {
+          isBody = true;
+          highlightedLines.push('<div class="h-2"></div>');
+          continue;
+        }
+
+        if (!isBody) {
+          let prefix = '';
+          let cleanLine = line;
+          if (line.startsWith('> ')) {
+            prefix = '<span class="text-slate-500 mr-2 select-none">&gt;</span>';
+            cleanLine = line.substring(2);
+          } else if (line.startsWith('< ')) {
+            prefix = '<span class="text-slate-500 mr-2 select-none">&lt;</span>';
+            cleanLine = line.substring(2);
+          }
+
+          // 1. Request Line: GET /url HTTP/1.1
+          const reqMatch = cleanLine.match(/^(GET|POST|PUT|DELETE|PATCH)\s+([^\s]+)(?:\s+(HTTP\/\d\.\d))?$/);
+          if (reqMatch) {
+            const method = reqMatch[1];
+            const url = reqMatch[2];
+            const version = reqMatch[3] || 'HTTP/1.1';
+            highlightedLines.push(`${prefix}<span class="text-mac-accent font-extrabold">${method}</span> <span class="text-slate-100 font-medium break-all select-all">${esc(url)}</span> <span class="text-slate-500 font-mono text-[10px]">${esc(version)}</span>`);
+            continue;
+          }
+
+          // 2. Response Status Line: HTTP/1.1 200 OK
+          const resMatch = cleanLine.match(/^(HTTP\/\d\.\d)\s+(\d{3})(?:\s+(.*))?$/);
+          if (resMatch) {
+            const version = resMatch[1];
+            const status = resMatch[2];
+            const statusText = resMatch[3] || '';
+            const statusColor = status.startsWith('2') ? 'text-mac-green' : (status.startsWith('3') ? 'text-mac-blue' : 'text-mac-accent');
+            highlightedLines.push(`${prefix}<span class="text-slate-500 font-mono text-[10px]">${esc(version)}</span> <span class="${statusColor} font-extrabold select-all">${status}</span> <span class="${statusColor}/80 font-bold">${esc(statusText)}</span>`);
+            continue;
+          }
+
+          // 3. Headers: Key: Value
+          const headerMatch = cleanLine.match(/^([a-zA-Z0-9\-]+):\s*(.*)$/);
+          if (headerMatch) {
+            const key = headerMatch[1];
+            const val = headerMatch[2];
+            highlightedLines.push(`${prefix}<span class="text-mac-blue/80 font-medium select-all">${esc(key)}:</span> <span class="text-slate-300 select-all font-mono">${esc(val)}</span>`);
+            continue;
+          }
+        }
+
+        // If it's a DAST Verification Oracle custom section
+        if (line.includes('--- DAST Verification Oracle ---')) {
+          highlightedLines.push(`<div class="mt-4 pt-3.5 border-t border-white/10 text-mac-green font-bold text-[11.5px] flex items-center gap-1.5 uppercase tracking-wider select-none"><span class="w-1.5 h-1.5 rounded-full bg-mac-green animate-pulse"></span>DAST Verification Oracle</div>`);
+          continue;
+        }
+
+        if (line.startsWith('Trigger Signature:')) {
+          highlightedLines.push(`<span class="text-slate-400 font-medium font-mono text-[11px] select-none">Trigger Signature:</span> <span class="text-mac-green font-bold select-all font-mono">${esc(line.substring(18).trim())}</span>`);
+          continue;
+        }
+
+        if (line.startsWith('Payload:')) {
+          highlightedLines.push(`<span class="text-slate-400 font-medium font-mono text-[11px] select-none">Payload:</span> <span class="text-mac-accent font-bold select-all font-mono">${esc(line.substring(8).trim())}</span>`);
+          continue;
+        }
+
+        // 4. Parameter Label: [Parameter: name]
+        const paramMatch = line.match(/^\[Parameter:\s*([^\]]+)\]$/);
+        if (paramMatch) {
+          const paramName = paramMatch[1];
+          highlightedLines.push(`<div class="inline-block mt-3.5 mb-1.5 px-2.5 py-1 rounded bg-mac-orange/10 border border-mac-orange/20 text-mac-orange font-bold text-[11px] font-mono select-none">[Parameter: ${esc(paramName)}]</div>`);
+          continue;
+        }
+
+        // Default fallback line representation
+        if (isBody) {
+          highlightedLines.push(`<span class="text-slate-300 font-mono leading-relaxed select-all break-all block">${esc(line)}</span>`);
+        } else {
+          highlightedLines.push(`<span class="text-slate-400 font-mono leading-relaxed select-all break-all block">${esc(line)}</span>`);
+        }
+      }
+
+      return highlightedLines.join('\n');
+    }
+
+    function generateCurlCommand(f) {
+      const s = f.strike || {};
+      const payload = s.payload || '';
+      let url = `http://localhost:8080/login?${f.parameter}=${encodeURIComponent(payload)}`;
+      if (s.rawRequest) {
+        const firstLine = s.rawRequest.split('\n')[0];
+        const urlMatch = firstLine.match(/^[A-Z]+\s+([^\s]+)/);
+        if (urlMatch) {
+          url = urlMatch[1];
+        }
+      }
+      if (f.httpMethod === 'POST') {
+        const baseUrl = url.split('?')[0];
+        return `curl -i -X POST \\\n  -H "Content-Type: application/x-www-form-urlencoded" \\\n  -d "${f.parameter}=${encodeURIComponent(payload)}" \\\n  "${baseUrl}"`;
+      } else {
+        return `curl -i -X GET \\\n  "${url}"`;
+      }
+    }
+
+    function renderHttpTab(f) {
+      const s = f.strike || {};
+      let text = '—';
+      if (activeTab === 'curl') {
+        text = generateCurlCommand(f);
+      } else if (activeTab === 'request') {
+        const raw = s.rawRequest || '—';
+        if (raw !== '—') {
+          const lines = raw.split('\n');
+          let isBody = false;
+          text = lines.map(line => {
+            if (line.trim() === '') {
+              isBody = true;
+              return line;
+            }
+            if (!isBody) {
+              return '> ' + line;
+            }
+            return line;
+          }).join('\n');
+        }
+      } else if (activeTab === 'response') {
+        const raw = s.rawResponse || '—';
+        if (raw !== '—') {
+          const lines = raw.split('\n');
+          let isBody = false;
+          text = lines.map(line => {
+            if (line.trim() === '') {
+              isBody = true;
+              return line;
+            }
+            if (!isBody) {
+              return '< ' + line;
+            }
+            return line;
+          }).join('\n');
+        }
+        if (s.confirmationRule) {
+          text += `\n\n--- DAST Verification Oracle ---\nTrigger Signature: ${s.confirmationRule}\nPayload: ${s.payload || 'n/a'}`;
+        }
+      }
+      $('#httpView').innerHTML = highlightHttp(text);
+    }
+
+    function updateTabPill() {
+      const activeBtn = $(`.tab-btn[data-tab="${activeTab}"]`);
+      const pill = $('#tabPill');
+      if (activeBtn && pill) {
+        pill.style.left = `${activeBtn.offsetLeft}px`;
+        pill.style.width = `${activeBtn.offsetWidth}px`;
+      }
+    }
+
+    window.addEventListener('resize', updateTabPill);
+
+    function esc(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    const cursorGlow = document.getElementById('cursorGlow');
+    window.addEventListener('mousemove', (e) => {
+      if (cursorGlow) {
+        cursorGlow.style.opacity = '1';
+        cursorGlow.style.left = `${e.clientX - 175}px`;
+        cursorGlow.style.top = `${e.clientY - 175}px`;
+      }
+    });
+    window.addEventListener('mouseleave', () => {
+      if (cursorGlow) cursorGlow.style.opacity = '0';
+    });
+
+    $('#reloadBtn').addEventListener('click', load);
+    load();
+  </script>
+</body>
+
+</html>

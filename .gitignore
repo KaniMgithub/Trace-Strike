@@ -1,0 +1,7 @@
+target/
+.m2/
+${project.basedir}/
+*.class
+dashboard-telemetry.json
+trace-report.json
+TargetUserController.java
